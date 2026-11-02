@@ -14,8 +14,31 @@ from security import (
 )
 
 from config import settings
+import logging
+from fastapi.responses import JSONResponse
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+)
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception(
+        "Unhandled exception during %s %s",
+        request.method,
+        request.url.path,
+    )
+
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+    )
 
 # 2. Define who is allowed to talk to this API
 origins = [settings.frontend_url]
@@ -90,7 +113,7 @@ def get_prompts(db: Session = Depends(get_db), current_user: models.User = Depen
 def create_prompt(new_prompt: PromptCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     if new_prompt.title.strip() == "" or new_prompt.content.strip() == "":
         raise HTTPException(status_code = 400, detail = "Title and Content cannot be empty!")
-    print(f"Received a new prompt: {new_prompt.title}")
+    logger.info("Prompt created successfully")
     new_db_prompt = models.Prompt(title=new_prompt.title, category=new_prompt.category, content=new_prompt.content, user_id = current_user.id)
     db.add(new_db_prompt)
     db.commit()
