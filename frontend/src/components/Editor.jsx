@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import PromptEditor from "./PromptEditor";
 import { ChevronDown } from "lucide-react";
@@ -86,7 +86,7 @@ function Editor({ modifyPrompts }) {
 
         hydrateEditor();
 
-    }, [id]);
+    }, [id, modifyPrompts]);
 
     const handleSave = async () => {
         if (
