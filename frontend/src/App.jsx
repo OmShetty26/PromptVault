@@ -2,7 +2,7 @@ import Sidebar from "./components/Sidebar";
 import Editor from "./components/Editor";
 
 import { useState, useEffect } from "react";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, useNavigate, Outlet } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./components/Login"
@@ -46,8 +46,9 @@ function AppLayout({ prompts, setPrompts, onLogout }) {
 
 function ProjectApp() {
     const [savedPrompts, setSavedPrompts] = useState([]);
-    const [currentUser, setCurrentUser] = useState(null);
+    const [, setCurrentUser] = useState(null);
     const [authStatus, setAuthStatus] = useState("checking");
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function checkAuth() {
@@ -68,7 +69,7 @@ function ProjectApp() {
                     setCurrentUser(null);
                     setAuthStatus("unauthenticated");
                 }
-            } catch (error) {
+            } catch {
                 setCurrentUser(null);
                 setAuthStatus("unauthenticated");
             }
@@ -79,7 +80,6 @@ function ProjectApp() {
 
     useEffect(() => {
         if (authStatus !== "authenticated") {
-            setSavedPrompts([]);
             return;
         }
 
