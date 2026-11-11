@@ -26,7 +26,7 @@ jobs:
       DATABASE_URL: sqlite://
       SECRET_KEY: ci-only-secret-key-not-for-production-0123456789
       FRONTEND_URL: http://localhost:5173
-      ENVIRONMENT: test
+      ENVIRONMENT: development
       COOKIE_SAMESITE: lax
 
     defaults:
