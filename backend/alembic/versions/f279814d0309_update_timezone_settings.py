@@ -34,5 +34,5 @@ def downgrade() -> None:
     op.alter_column('prompts', 'created_at',
                existing_type=sa.DateTime(timezone=True),
                type_=postgresql.TIMESTAMP(),
-               nullable=True)
+               nullable=False)
     # ### end Alembic commands ###
