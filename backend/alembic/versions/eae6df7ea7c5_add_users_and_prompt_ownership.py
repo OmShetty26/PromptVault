@@ -30,7 +30,14 @@ def upgrade() -> None:
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
     op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
     op.add_column('prompts', sa.Column('user_id', sa.Integer(), nullable=True))
-    op.create_foreign_key(None, 'prompts', 'users', ['user_id'], ['id'], ondelete='CASCADE')
+    op.create_foreign_key(
+        "prompts_user_id_fkey",
+        "prompts",
+        "users",
+        ["user_id"],
+        ["id"],
+        ondelete="CASCADE",
+    )
     # ### end Alembic commands ###
 
 
@@ -40,7 +47,11 @@ def downgrade() -> None:
     # WARNING: constraint name is None; this directive will fail as
     # rendered.  Add a name, or use a naming convention; see
     # https://alembic.sqlalchemy.org/en/latest/naming.html
-    op.drop_constraint(None, 'prompts', type_='foreignkey')
+    op.drop_constraint(
+        "prompts_user_id_fkey",
+        "prompts",
+        type_="foreignkey",
+    )
     op.drop_column('prompts', 'user_id')
     op.drop_index(op.f('ix_users_username'), table_name='users')
     op.drop_index(op.f('ix_users_id'), table_name='users')
