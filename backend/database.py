@@ -3,7 +3,10 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from config import settings
 
 # 2. Create the Engine (connect_args is a special requirement just for SQLite)
-engine = create_engine(settings.database_url)
+engine = create_engine(
+    settings.database_url,
+    pool_pre_ping=True
+)
 
 # 3. Create a Session Local class (This is the factory that makes database sessions)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

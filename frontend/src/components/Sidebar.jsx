@@ -15,6 +15,8 @@ import {
     LogOut
 } from "lucide-react";
 
+import { apiUrl } from "../api.js";
+
 
 function Sidebar({ prompts, setPrompts, onLogout }) {
     const [openMenuId, setOpenMenuId] = useState(null);
@@ -108,7 +110,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
     const handleTogglePin = async (prompt) => {
         try {
             const response = await fetch(
-                `http://localhost:8000/prompt/${prompt.id}/pin`,
+                apiUrl(`/prompt/${prompt.id}/pin`),
                 {
                     method: "PATCH",
 
@@ -177,7 +179,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
 
         try {
             const response = await fetch(
-                `http://localhost:8000/prompt/${prompt.id}`,
+                apiUrl(`/prompt/${prompt.id}`),
                 {
                     method: "DELETE",
                     credentials: "include"
@@ -240,7 +242,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
 
         try {
             const response = await fetch(
-                `http://localhost:8000/prompt/${prompt.id}/rename`,
+                apiUrl(`/prompt/${prompt.id}/rename`),
                 {
                     method: "PATCH",
 

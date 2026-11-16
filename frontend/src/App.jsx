@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./components/Login"
 import Register from "./components/Register"
 import LandingPage from "./components/LandingPage";
+import { apiUrl } from "./api.js";
 
 function AppLayout({ prompts, setPrompts, onLogout }) {
     return (
@@ -54,7 +55,7 @@ function ProjectApp() {
         async function checkAuth() {
             try {
                 const response = await fetch(
-                    "http://localhost:8000/auth/me",
+                    apiUrl("/auth/me"),
                     { 
                         credentials: "include"
                     }
@@ -86,7 +87,7 @@ function ProjectApp() {
         const fetchPrompts = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:8000/api/prompts",
+                    apiUrl("/api/prompts"),
                     {
                         credentials: "include"
                     }
@@ -111,7 +112,7 @@ function ProjectApp() {
     const handleLogout = async () => {
         try {
             const response = await fetch(
-                "http://localhost:8000/auth/logout",
+                apiUrl("/auth/logout"),
                 {
                     method: "POST",
                     credentials: "include"
