@@ -1,3 +1,4 @@
+from pathlib import Path
 from fastapi import FastAPI, Depends, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -15,7 +16,7 @@ from security import (
 
 from config import settings
 import logging
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 
 logging.basicConfig(
@@ -51,6 +52,10 @@ app.add_middleware(
     allow_methods=["*"],         # Allow all methods (GET, POST, etc.)
     allow_headers=["*"],         # Allow all headers
 )
+
+@app.get("/health", tags=["health"])
+def health_check():
+    return {"status": "ok"}
 
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
@@ -364,5 +369,55 @@ def logout_user(response: Response, current_user: models.User = Depends(get_curr
     )
 
     return {"message": "Logged out successfully"}
+
+
+# Serve the production React frontend
+FRONTEND_DIST_DIR = (
+    Path(__file__).resolve().parent / "static"
+).resolve()
+
+if (FRONTEND_DIST_DIR / "index.html").is_file():
+
+    @app.get("/", include_in_schema=False)
+    async def serve_frontend_root():
+        return FileResponse(FRONTEND_DIST_DIR / "index.html")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_frontend(full_path: str):
+
+        # Preserve 404 responses for unknown API endpoints
+        if (
+            full_path in {"api", "auth", "prompt"}
+            or full_path.startswith(("api/", "auth/", "prompt/"))
+        ):
+            raise HTTPException(
+                status_code=404,
+                detail="Not Found"
+            )
+
+        requested_file = (
+            FRONTEND_DIST_DIR / full_path
+        ).resolve()
+
+        # Serve actual frontend assets, such as JS, CSS and images
+        if (
+            requested_file.is_relative_to(FRONTEND_DIST_DIR)
+            and requested_file.is_file()
+        ):
+            return FileResponse(requested_file)
+
+        # Don't return index.html for missing static assets
+        if (
+            full_path == "assets"
+            or full_path.startswith("assets/")
+            or Path(full_path).suffix
+        ):
+            raise HTTPException(
+                status_code=404,
+                detail="Not Found"
+            )
+
+        # Let React handle frontend routes
+        return FileResponse(FRONTEND_DIST_DIR / "index.html")
 
 

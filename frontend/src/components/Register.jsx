@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { apiUrl } from "../api.js";
 
 export default function Register({ setCurrentUser, setAuthStatus }) {
     const [username, setUsername] = useState("");
@@ -24,7 +25,7 @@ export default function Register({ setCurrentUser, setAuthStatus }) {
             setSubmitting(true);
 
             const response = await fetch(
-                "http://localhost:8000/auth/register",
+                apiUrl("/auth/register"),
                 {
                     method: "POST",
                     credentials: "include",
