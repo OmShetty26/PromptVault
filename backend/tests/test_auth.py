@@ -171,3 +171,25 @@ def test_logout_clears_session(client):
     user_response = client.get("/auth/me")
 
     assert user_response.status_code == 401
+
+
+
+def test_registration_validation_does_not_echo_password(client):
+    submitted_password = "short-pass"
+
+    response = client.post(
+        "/auth/register",
+        json={
+            "username": "validation_test_short",
+            "password": submitted_password,
+        },
+    )
+
+    assert response.status_code == 422
+
+    details = response.json()["detail"]
+
+    assert details
+    assert all("input" not in error for error in details)
+    assert all("ctx" not in error for error in details)
+    assert submitted_password not in response.text
