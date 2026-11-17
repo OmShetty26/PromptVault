@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import { apiUrl } from "../api.js";
+import { apiUrl, getApiErrorMessage } from "../api.js";
 
 export default function Login({ setCurrentUser, setAuthStatus }) {
     const [username, setUsername] = useState("");
@@ -39,11 +39,10 @@ export default function Login({ setCurrentUser, setAuthStatus }) {
                 }
             );
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                console.error(error);
-                setError(data.detail || "Login failed.");
+                setError(getApiErrorMessage(data.detail, "Login failed."));
                 return;
             }
 

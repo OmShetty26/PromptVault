@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import { apiUrl } from "../api.js";
+import { apiUrl, getApiErrorMessage } from "../api.js";
 
 export default function Register({ setCurrentUser, setAuthStatus }) {
     const [username, setUsername] = useState("");
@@ -16,8 +16,26 @@ export default function Register({ setCurrentUser, setAuthStatus }) {
         e.preventDefault();
         setError("");
 
-        if (!username || !password) {
+        const normalizedUsername = username.trim();
+
+        if (!normalizedUsername || !password) {
             setError("Please fill in all the fields.");
+            return;
+        }
+
+        if (
+            normalizedUsername.length < 3 ||
+            normalizedUsername.length > 30 ||
+            !/^[A-Za-z0-9_]+$/.test(normalizedUsername)
+        ) {
+            setError(
+                "Username must be 3–30 characters and contain only letters, numbers, and underscores."
+            );
+            return;
+        }
+
+        if (password.length < 12) {
+            setError("Password must be at least 12 characters long.");
             return;
         }
 
@@ -33,17 +51,18 @@ export default function Register({ setCurrentUser, setAuthStatus }) {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        username,
+                        username: normalizedUsername,
                         password,
                     }),
                 }
             );
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                console.error(error);
-                setError(data.detail || "Registration failed.");
+                setError(
+                    getApiErrorMessage(data.detail, "Registration failed.")
+                );
                 return;
             }
 
@@ -51,12 +70,13 @@ export default function Register({ setCurrentUser, setAuthStatus }) {
             setAuthStatus("unauthenticated");
             navigate("/login");
         } catch (error) {
-            console.error(error);
+            console.error("Registration request failed:", error);
             setError("Unable to connect to the server. Please try again.");
         } finally {
             setSubmitting(false);
         }
     };
+
 
     return (
         <div className="flex h-dvh flex-col bg-zinc-950 text-zinc-100">
@@ -159,7 +179,12 @@ export default function Register({ setCurrentUser, setAuthStatus }) {
                     )}
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
+                    <form
+                        onSubmit={handleSubmit}
+                        autoComplete="off"
+                        noValidate
+                        className="space-y-4"
+                    >
                         <div>
                             <label
                                 htmlFor="username"
@@ -174,7 +199,11 @@ export default function Register({ setCurrentUser, setAuthStatus }) {
                                 name="username"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                autoComplete="off"
+                                required
+                                minLength={3}
+                                maxLength={30}
+                                pattern="[A-Za-z0-9_]+"
+                                autoComplete="username"
                                 disabled={submitting}
                                 className="
                                     w-full rounded-lg
@@ -208,7 +237,10 @@ export default function Register({ setCurrentUser, setAuthStatus }) {
                                     name="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    autoComplete="current-password"
+                                    required
+                                    minLength={12}
+                                    autoComplete="new-password"
+                                    disabled={submitting}
                                     className="
                                         w-full
                                         rounded-lg
