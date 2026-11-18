@@ -110,7 +110,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
     const handleTogglePin = async (prompt) => {
         try {
             const response = await fetch(
-                apiUrl(`/prompt/${prompt.id}/pin`),
+                apiUrl(`/api/prompts/${prompt.id}/pin`),
                 {
                     method: "PATCH",
 
@@ -179,7 +179,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
 
         try {
             const response = await fetch(
-                apiUrl(`/prompt/${prompt.id}`),
+                apiUrl(`/api/prompts/${prompt.id}`),
                 {
                     method: "DELETE",
                     credentials: "include"
@@ -206,7 +206,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
 
             if (
                 location.pathname ===
-                `/prompt/${prompt.id}`
+                `/api/prompts/${prompt.id}`
             ) {
                 navigate("/create");
             }
@@ -242,7 +242,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
 
         try {
             const response = await fetch(
-                apiUrl(`/prompt/${prompt.id}/rename`),
+                apiUrl(`/api/prompts/${prompt.id}/rename`),
                 {
                     method: "PATCH",
 
@@ -297,7 +297,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
     const renderPrompt = (prompt) => {
         const isActive =
             location.pathname ===
-            `/prompt/${prompt.id}`;
+            `/api/prompts/${prompt.id}`;
 
         const menuOpen =
             openMenuId === prompt.id;
@@ -380,7 +380,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
                     />
                 ) : (
                     <NavLink
-                        to={`/prompt/${prompt.id}`}
+                        to={`/api/prompts/${prompt.id}`}
                         className="
                             flex-1
                             min-w-0

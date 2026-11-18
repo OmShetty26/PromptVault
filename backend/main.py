@@ -151,7 +151,7 @@ def create_prompt(new_prompt: PromptCreate, current_user: models.User = Depends(
     return new_db_prompt
 
 #PUT route to update existing prompts
-@app.put("/prompt/{prompt_id}")
+@app.put("/api/prompts/{prompt_id}")
 def update_prompt(
     prompt_id: int,
     updated_prompt: PromptCreate,
@@ -189,7 +189,7 @@ def update_prompt(
     return db_prompt
 
 # GET one prompt
-@app.get("/prompt/{prompt_id}")
+@app.get("/api/prompts/{prompt_id}")
 def get_prompt(prompt_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     db_prompt = (
         db.query(models.Prompt)
@@ -205,7 +205,7 @@ def get_prompt(prompt_id: int, current_user: models.User = Depends(get_current_u
 
 
 # PATCH pin status
-@app.patch("/prompt/{prompt_id}/pin")
+@app.patch("/api/prompts/{prompt_id}/pin")
 def update_prompt_pin(
     prompt_id: int,
     update: PromptPinUpdate,
@@ -230,7 +230,7 @@ def update_prompt_pin(
 
 
 # Record prompt opening
-@app.post("/prompt/{prompt_id}/open")
+@app.post("/api/prompts/{prompt_id}/open")
 def open_prompt(
     prompt_id: int,
     current_user: models.User = Depends(get_current_user),
@@ -254,7 +254,7 @@ def open_prompt(
 
 
 # DELETE prompt
-@app.delete("/prompt/{prompt_id}")
+@app.delete("/api/prompts/{prompt_id}")
 def delete_prompt(
     prompt_id: int,
     current_user: models.User = Depends(get_current_user),
@@ -274,7 +274,7 @@ def delete_prompt(
 
     return {"status": "success"}
 
-@app.patch("/prompt/{prompt_id}/rename")
+@app.patch("/api/prompts/{prompt_id}/rename")
 def rename_prompt(
     prompt_id: int,
     update: PromptRenameUpdate,

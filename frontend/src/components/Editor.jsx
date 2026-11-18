@@ -27,7 +27,7 @@ function Editor({ modifyPrompts }) {
 
             try {
                 const response = await fetch(
-                    apiUrl(`/prompt/${id}`),
+                    apiUrl(`/api/prompts/${id}`),
                     {credentials: "include"}
                 );
 
@@ -50,7 +50,7 @@ function Editor({ modifyPrompts }) {
 
 
                 const openedResponse = await fetch(
-                    apiUrl(`/prompt/${id}/open`),
+                    apiUrl(`/api/prompts/${id}/open`),
                     {
                         method: "POST",
                         credentials: "include"
@@ -98,7 +98,7 @@ function Editor({ modifyPrompts }) {
         }
 
         const fetchUrl = id
-            ? apiUrl(`/prompt/${id}`)
+            ? apiUrl(`/api/prompts/${id}`)
             : apiUrl("/api/prompts");
 
         const fetchMethod = id ? "PUT" : "POST";
