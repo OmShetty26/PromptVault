@@ -158,7 +158,7 @@ function ProjectApp() {
                     element={<Editor modifyPrompts={setSavedPrompts} />}
                 />
                 <Route
-                    path="api/prompts/:id"
+                    path="/prompt/:id"
                     element={<Editor modifyPrompts={setSavedPrompts} />}
                 />
             </Route>

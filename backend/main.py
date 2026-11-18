@@ -128,10 +128,6 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
 
     return user
 
-@app.get("/home")
-def root():
-    return {"message": "The PromptVault Engine is Online"}
-
 @app.get("/api/prompts")
 def get_prompts(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     response = db.query(models.Prompt).filter(models.Prompt.user_id == current_user.id).all()
@@ -411,8 +407,8 @@ if (FRONTEND_DIST_DIR / "index.html").is_file():
 
         # Preserve 404 responses for unknown API endpoints
         if (
-            full_path in {"api", "auth", "prompt"}
-            or full_path.startswith(("api/", "auth/", "prompt/"))
+            full_path in {"api", "auth"}
+            or full_path.startswith(("api/", "auth/"))
         ):
             raise HTTPException(
                 status_code=404,

@@ -206,7 +206,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
 
             if (
                 location.pathname ===
-                `/api/prompts/${prompt.id}`
+                `/prompt/${prompt.id}`
             ) {
                 navigate("/create");
             }
@@ -297,7 +297,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
     const renderPrompt = (prompt) => {
         const isActive =
             location.pathname ===
-            `/api/prompts/${prompt.id}`;
+            `/prompt/${prompt.id}`;
 
         const menuOpen =
             openMenuId === prompt.id;
@@ -380,7 +380,7 @@ function Sidebar({ prompts, setPrompts, onLogout }) {
                     />
                 ) : (
                     <NavLink
-                        to={`/api/prompts/${prompt.id}`}
+                        to={`/prompt/${prompt.id}`}
                         className="
                             flex-1
                             min-w-0
