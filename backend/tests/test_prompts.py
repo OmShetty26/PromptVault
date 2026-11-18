@@ -41,7 +41,7 @@ def test_list_prompts_returns_current_users_prompts(client):
 
 def test_get_own_prompt_success(client, authenticated_user):
     user_prompt = create_prompt(client, title="test_prompt", content="Sample text")
-    db_response = client.get(f"/prompt/{user_prompt['id']}")
+    db_response = client.get(f"api/prompts/{user_prompt['id']}")
     assert db_response.status_code == 200
 
     db_prompt = db_response.json()
@@ -56,7 +56,7 @@ def test_update_own_prompt_success(client, authenticated_user):
     }
 
     og_prompt = create_prompt(client)
-    update_response = client.put(f"/prompt/{og_prompt['id']}", json=upd_payload)
+    update_response = client.put(f"api/prompts/{og_prompt['id']}", json=upd_payload)
     assert update_response.status_code == 200
 
     updated_prompt = update_response.json()
@@ -68,10 +68,10 @@ def test_update_own_prompt_success(client, authenticated_user):
 
 def test_delete_own_prompt_success(client, authenticated_user):
     user_prompt = create_prompt(client)
-    delete_response = client.delete(f"/prompt/{user_prompt['id']}")
+    delete_response = client.delete(f"api/prompts/{user_prompt['id']}")
     assert delete_response.status_code == 200
 
-    new_response = client.get(f"/prompt/{user_prompt['id']}")
+    new_response = client.get(f"api/prompts/{user_prompt['id']}")
     assert new_response.status_code == 404
 
 
@@ -86,7 +86,7 @@ def test_create_prompt_rejects_invalid_payload(client, authenticated_user):
 
 
 def test_get_missing_prompt_returns_404(client, authenticated_user):
-    missing_response = client.get("/prompt/99999")
+    missing_response = client.get("api/prompts/99999")
     assert missing_response.status_code == 404
 
 
@@ -96,7 +96,7 @@ def test_user_cannot_get_another_users_prompt(client):
     client.post("/auth/logout")
 
     register_and_login(client, username="user_2")
-    unauth_response = client.get(f"/prompt/{prompt_1['id']}")
+    unauth_response = client.get(f"api/prompts/{prompt_1['id']}")
     assert unauth_response.status_code == 404
 
 
@@ -114,7 +114,7 @@ def test_user_cannot_update_another_users_prompt(client):
     register_and_login(client, username="user_2")
 
     response = client.put(
-        f"/prompt/{prompt_1['id']}",
+        f"api/prompts/{prompt_1['id']}",
         json=update_payload,
     )
 
@@ -127,7 +127,7 @@ def test_user_cannot_delete_another_users_prompt(client):
     client.post("/auth/logout")
 
     register_and_login(client, username="user_2")
-    unauth_response = client.delete(f"/prompt/{prompt_1['id']}")
+    unauth_response = client.delete(f"api/prompts/{prompt_1['id']}")
     assert unauth_response.status_code == 404
 
 
