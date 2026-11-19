@@ -1,54 +1,226 @@
-***
+# PromptVault — Backend API
 
-### 2. Backend README (`prompt-vault-backend/README.md`)
+The FastAPI backend for **PromptVault**, a full-stack application for securely managing and organizing reusable LLM prompts.
 
-# PromptVault API
+The backend handles authentication, request validation, prompt management, user-specific data access, and PostgreSQL persistence.
 
-A FastAPI backend handling data persistence, schema validation, and REST routing for the PromptVault application. 
-
-*The React frontend repository for this project is located [here](https://github.com/OmShetty26/prompt-vault).*
+**Repository:** [PromptVault](https://github.com/OmShetty26/PromptVault)  
+**Live application:** [https://promptvault-app-8w2n.onrender.com](https://promptvault-app-8w2n.onrender.com)
 
 ## Tech Stack
-* **Framework:** FastAPI (Python)
-* **Server Engine:** Uvicorn
-* **Database & ORM:** PostgreSQL / SQLAlchemy
 
-## Architecture & Features
-* **RESTful Endpoints:** Provides structured GET and POST routes to handle CRUD operations for prompt data payloads.
-* **Relational Database Mapping:** Uses SQLAlchemy ORM models to define strict database schemas and handle data persistence.
-* **CORS Configuration:** Explicitly configured middleware to accept cross-origin network requests from the decoupled local frontend environment.
-* **Automatic Documentation:** Leverages FastAPI's built-in Swagger UI integration to automatically generate and host API documentation.
+- **Framework:** FastAPI
+- **Language:** Python
+- **ASGI Server:** Uvicorn
+- **Database:** PostgreSQL
+- **ORM:** SQLAlchemy
+- **Migrations:** Alembic
+- **Database Driver:** Psycopg
+- **Testing:** Pytest
 
-## Local Setup
+## Features
 
-1. Clone the [backend repository](https://github.com/OmShetty26/prompt-vault-backend.git):
+- **Authentication:** User registration, login, logout, and authenticated session handling.
+- **Prompt CRUD:** Create, retrieve, update, and delete prompts.
+- **Prompt Organization:** Support for categories, pinning, and renaming.
+- **User Ownership:** Associates prompts with their owners and restricts access to other users' data.
+- **Request Validation:** Validates incoming requests using Pydantic schemas.
+- **Error Handling:** Centralized HTTP error handling and structured logging that avoids exposing sensitive information.
+- **Database Migrations:** Version-controlled database schema changes managed through Alembic.
+- **API Documentation:** Interactive Swagger documentation provided by FastAPI.
+
+## API Overview
+
+The application exposes REST endpoints for authentication and prompt management.
+
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `/auth/register` | POST | Register a user |
+| `/auth/login` | POST | Authenticate a user |
+| `/auth/logout` | POST | Log out a user |
+| `/auth/me` | GET | Retrieve the current authenticated user |
+| `/api/prompts` | GET | Retrieve the current user's prompts |
+| `/api/prompts` | POST | Create a prompt |
+| `/api/prompts/{id}` | GET | Retrieve a prompt |
+| `/api/prompts/{id}` | PUT | Update a prompt |
+| `/api/prompts/{id}` | DELETE | Delete a prompt |
+| `/api/prompts/{id}/pin` | PATCH | Toggle prompt pinning |
+| `/api/prompts/{id}/rename` | PATCH | Rename a prompt |
+| `/api/prompts/{id}/open` | POST | Record a prompt opening |
+| `/health` | GET | Check application health |
+
+The API uses authenticated requests and enforces prompt ownership.
+
+## Local Development
+
+### Prerequisites
+
+- Python 3.12
+- PostgreSQL, or Docker with Docker Compose
+- Git
+
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/OmShetty26/prompt-vault-backend.git
-cd prompt-vault-backend
+git clone https://github.com/OmShetty26/PromptVault.git
+cd PromptVault/backend
 ```
 
-2. Create and activate a Python virtual environment:
-    Windows:
-        ```bash
-        python -m venv venv
-        source venv/Scripts/activate
-        ```
+### 2. Create and activate a virtual environment
 
-    Mac/Linux:
-        ```bash
-        python3 -m venv venv
-        source venv/bin/activate
-        ```
+**Windows (Git Bash):**
 
-3. Install the required dependencies:
-    ```bash
-    pip install fastapi uvicorn sqlalchemy
-    ```
+```bash
+python -m venv .venv
+source .venv/Scripts/activate
+```
 
-4. Start the Uvicorn server:
-    ```bash
-    uvicorn main:app --reload
-    ```
+**macOS / Linux:**
 
-5. The API will boot on [http://127.0.0.1:8000](http://127.0.0.1:8000). Navigate to [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) to view the interactive API documentation. 
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure environment variables
+
+Create a local `.env` file using the variable names expected by the application:
+
+```env
+SECRET_KEY=your-local-secret-key
+DATABASE_URL=postgresql+psycopg://USER:PASSWORD@HOST:5432/DATABASE
+FRONTEND_URL=http://localhost:5173
+ENVIRONMENT=development
+COOKIE_SAMESITE=lax
+```
+
+Replace the example database connection details with your local PostgreSQL configuration.
+
+Never commit `.env` files, credentials, secret keys, or production database connection strings.
+
+### 5. Apply database migrations
+
+With PostgreSQL running and the database connection configured:
+
+```bash
+alembic upgrade head
+```
+
+### 6. Start the backend
+
+```bash
+uvicorn main:app --reload
+```
+
+The backend runs at:
+
+`http://localhost:8000`
+
+Interactive API documentation is available at:
+
+`http://localhost:8000/docs`
+
+## Database Migrations
+
+Alembic manages database schema changes.
+
+Common commands:
+
+```bash
+# Apply all pending migrations
+alembic upgrade head
+
+# Display migration history
+alembic history
+
+# Display the current database revision
+alembic current
+
+# Generate a migration from model changes
+alembic revision --autogenerate -m "describe changes"
+
+# Check whether model changes require a migration
+alembic check
+```
+
+Review autogenerated migrations before applying them. Do not edit an already-applied production migration; create a new migration instead.
+
+## Testing
+
+Backend tests are written using Pytest.
+
+Run the test suite from the `backend/` directory:
+
+```bash
+python -m pytest -q
+```
+
+## Docker
+
+The repository root contains the Docker Compose configuration for the local full-stack environment.
+
+From the repository root:
+
+```bash
+docker compose up --build
+```
+
+To stop the services:
+
+```bash
+docker compose down
+```
+
+To stop the services and remove the local PostgreSQL volume:
+
+```bash
+docker compose down -v
+```
+
+**Warning:** The `-v` option deletes the local database volume and its stored data. Use it only when you intentionally want to reset your local database.
+
+## CI/CD
+
+GitHub Actions runs automated checks for changes to the project.
+
+The CI workflow includes:
+
+- Backend tests using Python 3.12.
+- Frontend dependency installation.
+- Frontend ESLint checks.
+- Frontend production build.
+
+Production database migrations are handled separately through the production deployment workflow. The migration job applies pending migrations and checks the resulting Alembic revision.
+
+## Production Deployment
+
+PromptVault is deployed using:
+
+- **Application Hosting:** Render
+- **Database Hosting:** Neon PostgreSQL
+- **CI/CD:** GitHub Actions
+
+The production deployment uses a single Render Docker web service. The root Dockerfile builds the React frontend and packages its static assets with the FastAPI backend.
+
+The FastAPI application serves both the API and frontend, allowing the application to operate from one origin.
+
+Production configuration and credentials are supplied through environment variables and GitHub Actions secrets rather than committed to the repository.
+
+## Deployment Considerations
+
+The application currently uses free-tier hosting services.
+
+- Render free web services may spin down after periods of inactivity, resulting in slower initial requests.
+- Neon free-tier databases may suspend compute when idle and require time to resume.
+- Initial requests after inactivity may therefore take longer than subsequent requests.
+
+## Related Documentation
+
+- [Frontend README](../frontend/README.md)
+- [Root repository](https://github.com/OmShetty26/PromptVault)
